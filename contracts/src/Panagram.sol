@@ -32,7 +32,10 @@ contract Panagram is Ownable, ERC1155 {
     event Panagram_WinnerCrowned(address winner, uint256 round);
     event Panagram_RunnerUpCrowned(address runnerUp, uint256 round);
 
-    constructor(IVerifier _verifier) ERC1155("ipfs://bafybeicg3hsuiokx6trzyezcznmf33gjxw6jmyhmkt4qyrnmeyhvymt5xy/{id}.json") Ownable(msg.sender) {
+    constructor(IVerifier _verifier)
+        ERC1155("ipfs://bafybeicg3hsuiokx6trzyezcznmf33gjxw6jmyhmkt4qyrnmeyhvymt5xy/{id}.json")
+        Ownable(msg.sender)
+    {
         s_verifier = _verifier;
     }
 
@@ -105,7 +108,7 @@ contract Panagram is Ownable, ERC1155 {
         emit Panagram_VerifierUpdated(_verifier);
     }
 
-    function setURI (string memory newuri) external onlyOwner {
+    function setURI(string memory newuri) external onlyOwner {
         _setURI(newuri);
     }
 }
