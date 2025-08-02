@@ -79,8 +79,9 @@ contract Panagram is Ownable, ERC1155 {
             revert Panagram__AlreadyAnsweredCorrectlyInThisRound(msg.sender, s_currentRound);
         }
 
-        bytes32[] memory publicInputs = new bytes32[](1);
+        bytes32[] memory publicInputs = new bytes32[](2);
         publicInputs[0] = s_answer;
+        publicInputs[1] = bytes32(uint256(uint160(msg.sender)));    // Convert address to bytes32
 
         bool result = s_verifier.verify(_proof, publicInputs);
 
