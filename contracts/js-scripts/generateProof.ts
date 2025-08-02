@@ -41,6 +41,7 @@ export default async function generateProof() {
     const inputs = {
       guess_hash: inputsArray[0], // First CLI argument
       answer_hash: inputsArray[1], // Second CLI argument
+      user_address: inputsArray[2], // Third CLI argument
     };
 
     // 4. Execute the circuit with the inputs to generate the witness
