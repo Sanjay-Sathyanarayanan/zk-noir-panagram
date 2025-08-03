@@ -6,6 +6,7 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 contract Panagram is Ownable, ERC1155 {
+    
     // State variables
     uint256 public constant MIN_DURATION = 3 hours;
     bytes32 public s_answer;
@@ -111,5 +112,13 @@ contract Panagram is Ownable, ERC1155 {
 
     function setURI(string memory newuri) external onlyOwner {
         _setURI(newuri);
+    }
+
+    function getCurrentRoundStatus() external view returns (address) {
+        return (s_currentRoundWinner);
+    }
+
+    function getCurrentPanagram() external view returns (bytes32) {
+        return s_answer;
     }
 }
