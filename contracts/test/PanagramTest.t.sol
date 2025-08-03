@@ -38,10 +38,8 @@ contract PanagramTest is Test {
     }
 
     function test_MakeCorrectGuess() public {
-
-        vm.prank(user);
         
-    
+        vm.prank(user);
         panagram.makeGuess(proof);
     
         // Assertions
@@ -70,9 +68,12 @@ contract PanagramTest is Test {
     }
 
     function test_IncorrectGuessFails() public {
+
         bytes32 INCORRECT_ANSWER = bytes32(uint256(keccak256("outnumber")) % FIELD_MODULUS);
         bytes32 INCORRECT_GUESS = bytes32(uint256(keccak256("outnumber")) % FIELD_MODULUS);
+        // Generate a proof for an incorrect guess
         bytes memory incorrectProof = _getProof(INCORRECT_GUESS, INCORRECT_ANSWER, user);
+        // Attempt to make a guess with the incorrect proof
         vm.prank(user);
         vm.expectRevert();
         panagram.makeGuess(incorrectProof);
@@ -90,5 +91,20 @@ contract PanagramTest is Test {
         panagram.makeGuess(proof2);
         vm.assertEq(panagram.balanceOf(user2, 0), 0);
         vm.assertEq(panagram.balanceOf(user2, 1), 1);
+    }
+
+    function test_RevertPanagramIfMinimumTimeNotPassed() public {
+        // New round is already started in setUp
+        // Attempt to start a new round before the minimum duration has passed
+        vm.expectRevert(abi.encodeWithSelector(Panagram.Panagram__MinimumTimeNotPassed.selector, panagram.MIN_DURATION(), 0));
+        panagram.newRound(bytes32(uint256(keccak256("newanswer")) % FIELD_MODULUS));
+    }
+
+    function test_RevertIfNoWinnerYet() public {
+        // Start a new round without any winner
+        vm.warp(panagram.MIN_DURATION() + 1); // Ensure enough time has passed
+        // Attempt to start a new round again without a winner
+        vm.expectRevert(Panagram.Panagram__NoWinnerYet.selector);
+        panagram.newRound(bytes32(uint256(keccak256("newAnswer")) % FIELD_MODULUS));
     }
 }
