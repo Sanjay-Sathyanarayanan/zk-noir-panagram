@@ -40,7 +40,7 @@ export default async function generateProof() {
     // Example: Taking inputs from command-line arguments
     const inputs = {
       guess_hash: inputsArray[0], // First CLI argument
-      answer_hash: inputsArray[1], // Second CLI argument
+      answer_double_hash: inputsArray[1], // Second CLI argument
       user_address: inputsArray[2], // Third CLI argument
     };
 
