@@ -11,15 +11,17 @@ contract PanagramTest is Test {
 
     uint256 constant FIELD_MODULUS = 21888242871839275222246405745257275088548364400416034343698204186575808495617;
     bytes32 constant GUESS_SINGLE_HASH = bytes32(uint256(keccak256(bytes("answer"))) % FIELD_MODULUS);
-    bytes32 constant CORRECT_ANSWER_DOUBLE_HASH = bytes32(uint256(keccak256(abi.encodePacked(GUESS_SINGLE_HASH))) % FIELD_MODULUS);
+    bytes32 constant CORRECT_ANSWER_DOUBLE_HASH =
+        bytes32(uint256(keccak256(abi.encodePacked(GUESS_SINGLE_HASH))) % FIELD_MODULUS);
     // User address for testing
     address user = makeAddr("user");
 
     bytes proof;
+
     function _getProof(bytes32 guess, bytes32 correctAnswer, address sender) internal returns (bytes memory _proof) {
-        uint256 NUM_ARGS = 6;  
+        uint256 NUM_ARGS = 6;
         string[] memory inputs = new string[](NUM_ARGS);
-        
+
         inputs[0] = "npx";
         inputs[1] = "tsx";
         inputs[2] = "js-scripts/generateProof.ts";
@@ -40,16 +42,15 @@ contract PanagramTest is Test {
     }
 
     function test_MakeCorrectGuess() public {
-        
         vm.prank(user);
         panagram.makeGuess(proof);
-    
+
         // Assertions
         vm.assertEq(panagram.balanceOf(user, 0), 1, "Winner NFT not minted"); // ID 0 for winner
         vm.assertEq(panagram.balanceOf(user, 1), 0, "Runner-up NFT wrongly minted for winner");
-    
+
         // Test double spending/guessing
-        vm.expectRevert(); 
+        vm.expectRevert();
         vm.prank(user);
         panagram.makeGuess(proof);
     }
@@ -62,16 +63,29 @@ contract PanagramTest is Test {
         // min time passed
         vm.warp(panagram.MIN_DURATION() + 1);
         // start a new round
-        panagram.newRound(bytes32(uint256(keccak256(abi.encodePacked(bytes32(uint256(keccak256("abcdefghi")) % FIELD_MODULUS)))) % FIELD_MODULUS));
+        panagram.newRound(
+            bytes32(
+                uint256(keccak256(abi.encodePacked(bytes32(uint256(keccak256("abcdefghi")) % FIELD_MODULUS))))
+                    % FIELD_MODULUS
+            )
+        );
         // validate the state has reset
-        vm.assertEq(panagram.getCurrentPanagram(), bytes32(uint256(keccak256(abi.encodePacked(bytes32(uint256(keccak256("abcdefghi")) % FIELD_MODULUS)))) % FIELD_MODULUS));
+        vm.assertEq(
+            panagram.getCurrentPanagram(),
+            bytes32(
+                uint256(keccak256(abi.encodePacked(bytes32(uint256(keccak256("abcdefghi")) % FIELD_MODULUS))))
+                    % FIELD_MODULUS
+            )
+        );
         vm.assertEq(panagram.getCurrentRoundStatus(), address(0));
         vm.assertEq(panagram.s_currentRound(), 2);
     }
 
     function test_IncorrectGuessFails() public {
-
-        bytes32 INCORRECT_ANSWER = bytes32(uint256(keccak256(abi.encodePacked(bytes32(uint256(keccak256("outnumber")) % FIELD_MODULUS)))) % FIELD_MODULUS);
+        bytes32 INCORRECT_ANSWER = bytes32(
+            uint256(keccak256(abi.encodePacked(bytes32(uint256(keccak256("outnumber")) % FIELD_MODULUS))))
+                % FIELD_MODULUS
+        );
         bytes32 INCORRECT_GUESS = bytes32(uint256(keccak256("outnumber")) % FIELD_MODULUS);
         // Generate a proof for an incorrect guess
         bytes memory incorrectProof = _getProof(INCORRECT_GUESS, INCORRECT_ANSWER, user);
@@ -98,7 +112,9 @@ contract PanagramTest is Test {
     function test_RevertPanagramIfMinimumTimeNotPassed() public {
         // New round is already started in setUp
         // Attempt to start a new round before the minimum duration has passed
-        vm.expectRevert(abi.encodeWithSelector(Panagram.Panagram__MinimumTimeNotPassed.selector, panagram.MIN_DURATION(), 0));
+        vm.expectRevert(
+            abi.encodeWithSelector(Panagram.Panagram__MinimumTimeNotPassed.selector, panagram.MIN_DURATION(), 0)
+        );
         panagram.newRound(bytes32(uint256(keccak256("newanswer")) % FIELD_MODULUS));
     }
 

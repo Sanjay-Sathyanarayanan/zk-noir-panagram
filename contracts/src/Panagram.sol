@@ -6,7 +6,6 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {ERC1155} from "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 
 contract Panagram is Ownable, ERC1155 {
-    
     // State variables
     uint256 public constant MIN_DURATION = 3 hours;
     bytes32 public s_answer;
@@ -82,7 +81,7 @@ contract Panagram is Ownable, ERC1155 {
 
         bytes32[] memory publicInputs = new bytes32[](2);
         publicInputs[0] = s_answer;
-        publicInputs[1] = bytes32(uint256(uint160(msg.sender)));    // Convert address to bytes32
+        publicInputs[1] = bytes32(uint256(uint160(msg.sender))); // Convert address to bytes32
 
         bool result = s_verifier.verify(_proof, publicInputs);
 
